@@ -1,0 +1,158 @@
+<DIV ALIGN="LEFT"><P><FONT FACE="Georgia">The function <B>t(&#160;)</B> takes an
+ordinary non-<B>const</B> pointer as an argument, and <B>u(&#160;)</B> takes a
+<B>const</B> pointer. Inside <B>u(&#160;)</B> you can see that attempting to
+modify the destination of the <B>const</B> pointer is illegal, but you can of
+course copy the information out into a non-<B>const</B> variable. The compiler
+also prevents you from creating a non-<B>const</B> pointer using the address
+stored inside a <B>const</B> pointer.</FONT><BR></P></DIV>
+<DIV ALIGN="LEFT"><P><FONT FACE="Georgia">The functions <B>v(&#160;)</B> and
+<B>w(&#160;)</B> test return value
+semantics<A NAME="Index1524"></A><A NAME="Index1525"></A>. <B>v(&#160;)</B>
+returns a <B>const</B> <B>char*</B> that is created from a character array
+literal. This statement actually produces the address of the character array
+literal, after the compiler creates it and stores it in the static storage area.
+As mentioned earlier, this character array is technically a constant, which is
+properly expressed by the return value of <B>v(&#160;)</B>.</FONT><BR></P></DIV>
+<DIV ALIGN="LEFT"><P><FONT FACE="Georgia">The return value of <B>w(&#160;)</B>
+requires that both the pointer and what it points to must be <B>const</B>. As
+with <B>v(&#160;)</B>, the value returned by <B>w(&#160;)</B> is valid after the
+function returns only because it is
+<A NAME="Index1526"></A><A NAME="Index1527"></A><B>static</B>. You never want to
+return pointers to local stack variables because they will be invalid after the
+function returns and the stack is cleaned up. (Another common pointer you might
+return is the address of storage allocated on the heap, which is still valid
+after the function returns.)</FONT><BR></P></DIV>
+<DIV ALIGN="LEFT"><P><FONT FACE="Georgia">In <B>main(&#160;)</B>, the functions are
+tested with various arguments. You can see that <B>t(&#160;)</B> will accept a
+non-<B>const</B> pointer argument, but if you try to pass it a pointer to a
+<B>const</B>, there&#8217;s no promise that <B>t(&#160;)</B> will leave the
+pointer&#8217;s destination alone, so the compiler gives you an error message.
+<B>u(&#160;)</B> takes a <B>const</B> pointer, so it will accept both types of
+arguments. Thus, a function that takes a <B>const</B> pointer is more general
+than one that does not.</FONT><BR></P></DIV>
+<DIV ALIGN="LEFT"><P><FONT FACE="Georgia">As expected, the return value of
+<B>v(&#160;)</B> can be assigned only to a pointer to a <B>const</B>. You would
+also expect that the compiler refuses to assign the return value of
+<B>w(&#160;)</B> to a non-<B>const</B> pointer, and accepts a <B>const int*
+const</B>, but it might be a bit surprising to see that it also accepts a
+<B>const int*</B>, which is not an exact match to the return type. Once again,
+because the value (which is the address contained in the pointer) is being
+copied, the promise that the original variable is untouched is automatically
+kept. Thus, the second <B>const</B> in <B>const</B> <B>int* const</B> is only
+meaningful when you try to use it as an lvalue, in which case the compiler
+prevents you.</FONT><BR></P></DIV>
+<A NAME="Heading264"></A><FONT FACE = "Verdana"><H4 ALIGN="LEFT">
+Standard argument passing<BR><A NAME="Index1528"></A></H4></FONT>
+<DIV ALIGN="LEFT"><P><FONT FACE="Georgia">In C it&#8217;s very common to pass by
+value, and when you want to pass an address your only choice is to use a
+pointer</FONT><A NAME="fnB43" HREF="#fn43">[43]</A><FONT FACE="Georgia">.
+However, neither of these approaches is preferred in C++. Instead, your first
+choice when passing an argument is to pass by reference, and by <B>const</B>
+<A NAME="Index1529"></A>reference at that. To the client programmer, the syntax
+is identical to that of passing by value, so there&#8217;s no confusion about
+pointers &#8211; they don&#8217;t even have to think about
+<A NAME="Index1530"></A>pointers. For the creator of the function, passing an
+address is virtually always more efficient than passing an entire class object,
+and if you pass by <B>const</B> reference it means your function will not change
+the destination of that address, so the effect from the client
+programmer&#8217;s point of view is exactly the same as pass-by-value (only more
+efficient).</FONT><BR></P></DIV>
+<DIV ALIGN="LEFT"><P><FONT FACE="Georgia">Because of the syntax of references (it
+looks like pass-by-value to the caller) it&#8217;s possible to pass a
+temporary<A NAME="Index1531"></A><A NAME="Index1532"></A> object to a function
+that takes a <B>const </B>reference, whereas you can never pass a temporary
+object to a function that takes a pointer &#8211; with a pointer, the address
+must be explicitly taken. So passing by reference produces a new situation that
+never occurs in C: a temporary, which is always <B>const</B>, can have its
+<I>address</I> passed to a function. This is why, to allow temporaries to be
+passed to functions by reference, the argument must be a <B>const</B>
+reference<A NAME="Index1533"></A><A NAME="Index1534"></A>. The following example
+demonstrates this:</FONT><BR></P></DIV>
+
+<BLOCKQUOTE><FONT SIZE = "+1"><PRE><font color=#009900>//: C08:ConstTemporary.cpp</font>
+<font color=#009900>// Temporaries are const</font>
+
+<font color=#0000ff>class</font> X {};
+
+X f() { <font color=#0000ff>return</font> X(); } <font color=#009900>// Return by value</font>
+
+<font color=#0000ff>void</font> g1(X&amp;) {} <font color=#009900>// Pass by non-const reference</font>
+<font color=#0000ff>void</font> g2(<font color=#0000ff>const</font> X&amp;) {} <font color=#009900>// Pass by const reference</font>
+
+<font color=#0000ff>int</font> main() {
+  <font color=#009900>// Error: const temporary created by f():</font>
+<font color=#009900>//!  g1(f());</font>
+  <font color=#009900>// OK: g2 takes a const reference:</font>
+  g2(f());
+} <font color=#009900>///:~</font></PRE></FONT></BLOCKQUOTE>
+<DIV ALIGN="LEFT"><P><A NAME="_Toc305628678"></A><BR></P></DIV>
+<DIV ALIGN="LEFT"><P><FONT FACE="Georgia"><B>f(&#160;)</B> returns an object of
+<B>class X</B> <A NAME="Index1535"></A><I>by value</I>. That means when you
+immediately take the return value of <B>f(&#160;)</B> and pass it to another
+function as in the calls to <B>g1(&#160;)</B> and <B>g2(&#160;)</B>, a temporary
+is created and that temporary is <B>const</B>. Thus, the call in
+<B>g1(&#160;)</B> is an error because <B>g1(&#160;)</B> doesn&#8217;t take a
+<B>const</B> reference, but the call to <B>g2(&#160;)</B> is
+OK.</FONT><A NAME="_Toc312373916"></A><A NAME="_Toc472654890"></A><BR></P></DIV>
+<A NAME="Heading265"></A><FONT FACE = "Verdana"><H2 ALIGN="LEFT">
+Classes</H2></FONT>
+<DIV ALIGN="LEFT"><P><FONT FACE="Georgia">This section shows the ways you can use
+<B>const</B> with <A NAME="Index1536"></A>classes. You may want to create a
+local <B>const</B> in a class to use inside constant expressions that will be
+evaluated at compile time. However, the meaning of <B>const</B> is different
+inside classes, so you must understand the options in order to create
+<B>const</B> data members of a class.</FONT><BR></P></DIV>
+<DIV ALIGN="LEFT"><P><FONT FACE="Georgia">You can also make an entire object
+<B>const</B> (and as you&#8217;ve just seen, the compiler always makes temporary
+objects <B>const</B>). But preserving the <B>const</B>ness of an object is more
+complex. The compiler can ensure the <B>const</B>ness of a built-in type but it
+cannot monitor the intricacies of a class. To guarantee the <B>const</B>ness of
+a class object, the <B>const</B> member function is introduced: only a
+<B>const</B> member function
+<A NAME="Index1537"></A><A NAME="Index1538"></A><A NAME="Index1539"></A>may be
+called for a <B>const</B> object.
+</FONT><A NAME="_Toc312373917"></A><A NAME="_Toc472654891"></A><BR></P></DIV>
+<A NAME="Heading266"></A><FONT FACE = "Verdana"><H3 ALIGN="LEFT">
+const in
+classes<BR><A NAME="Index1540"></A><A NAME="Index1541"></A><A NAME="Index1542"></A><A NAME="Index1543"></A></H3></FONT>
+<DIV ALIGN="LEFT"><P><FONT FACE="Georgia">One of the places you&#8217;d like to use
+a <B>const</B> for constant expressions is inside classes. The typical example
+is when you&#8217;re creating an <A NAME="Index1544"></A>array inside a class
+and you want to use a <B>const</B> instead of a
+<A NAME="Index1545"></A><B>#define</B> to establish the array size and to use in
+calculations involving the array. The array size is something you&#8217;d like
+to keep hidden inside the class, so if you used a name like <B>size</B>, for
+example, you could use that name in another class without a clash. The
+preprocessor treats all <B>#define</B>s as global from the point they are
+defined, so this will not achieve the desired effect. </FONT><BR></P></DIV>
+<DIV ALIGN="LEFT"><P><FONT FACE="Georgia">You might assume that the logical choice
+is to place a <B>const</B> inside the class. This doesn&#8217;t produce the
+desired result. Inside a class, <B>const</B> partially reverts to its meaning in
+C. It allocates storage within each object and represents a value that is
+initialized once and then cannot change. The use of <B>const</B> inside a class
+means &#8220;This is constant for the lifetime of the object.&#8221; However,
+each different object may contain a different value for that
+constant.</FONT><BR></P></DIV>
+<DIV ALIGN="LEFT"><P><FONT FACE="Georgia">Thus, when you create an ordinary
+(non-<B>static</B>) <B>const</B> inside a class, you cannot give it an initial
+value. This initialization must occur in the constructor, of course, but in a
+special place in the constructor. Because a <B>const</B> must be initialized at
+the point it is created, inside the main body of the constructor the
+<B>const</B> must <I>already </I>be initialized. Otherwise you&#8217;re left
+with the choice of waiting until some point later in the constructor body, which
+means the <B>const</B> would be un-initialized for a while. Also, there would be
+nothing to keep you from changing the value of the <B>const</B> at various
+places in the constructor body.</FONT><BR></P></DIV>
+<A NAME="Heading267"></A><FONT FACE = "Verdana"><H4 ALIGN="LEFT">
+The constructor initializer list</H4></FONT>
+<DIV ALIGN="LEFT"><P><FONT FACE="Georgia">The special initialization point is
+called the <I>constructor initializer
+list<A NAME="Index1546"></A><A NAME="Index1547"></A><A NAME="Index1548"></A><A NAME="Index1549"></A></I>,
+and it was originally developed for use in inheritance (covered in Chapter 14).
+The constructor initializer list &#8211; which, as the name implies, occurs only
+in the definition of the constructor &#8211; is a list of &#8220;constructor
+calls&#8221; that occur after the function argument list and a colon, but before
+the opening brace of the constructor body. This is to remind you that the
+initialization in the list occurs before any of the main constructor code is
+executed. This is the place to put all <B>const</B> initializations. The proper
+form for <B inside a class is shown here:/FONT

@@ -1,24 +1,141 @@
 
+#include <cstddef>
+#include <ctime>
+#include <deque>
+#include <fstream>
 #include <iostream>
 #include <iterator>
-#include <algorithm>
-#include <memory>
-#include "Noisy.h"
+#include <sstream>
+#include <string>
+#include <vector>
 using namespace std;
 
 int main(){
-	const int QUANTITY = 10;
-	Noisy* np = reinterpret_cast<Noisy*>(new char[QUANTITY * sizeof(Noisy)]);
-	raw_storage_iterator<Noisy*, Noisy> rsi(np);
-	for(int i = 0; i < QUANTITY; i++)
-		*rsi++ = Noisy();
-	cout << endl;
-	copy(np, np+QUANTITY, ostream_iterator<Noisy>(cout, " "));
-	cout << endl;
-	for(int j = 0; j < QUANTITY; j++)
-		(&np[j])->~Noisy();
-	delete reinterpret_cast<char*>(np);
+	char* fname = "7.1213.cpp";
+	ifstream in(fname);
+	vector<string> vstrings;
+	deque<string> dstrings;
+	string line;
+	clock_t ticks = clock();
+	while(getline(in, line))
+		vstrings.push_back(line);
+	ticks = clock() - ticks;
+	cout << "Read into vector: " << ticks << endl;
+	ifstream in2(fname);
+	ticks = clock();
+	while(getline(in2, line))
+		dstrings.push_back(line);
+	ticks = clock() - ticks;
+	cout << "Read into deque: " << ticks << endl;
+	ticks = clock();
+	for(size_t i = 0; i < vstrings.size(); i++){
+		ostringstream ss;
+		ss << i;
+		vstrings[i] = ss.str() + ": " + vstrings[i];
+	}
+	ticks = clock() - ticks;
+	cout << "Indexing vector: " << ticks << endl;
+	ticks = clock();
+	for(size_t j = 0; j < dstrings.size(); j++){
+		ostringstream ss;
+		ss << j;
+		dstrings[j] = ss.str() + ": " + dstrings[j];
+	}
+	ticks = clock() - ticks;
+	cout << "Indexing deque: " << ticks << endl;
+	ofstream tmp1("tmp1.tmp"), tmp2("tmp2.tmp");
+	ticks = clock();
+	copy(vstrings.begin(), vstrings.end(), ostream_iterator<string>(tmp1, "\n"));
+	ticks = clock() - ticks;
+	cout << "Iterating vector: " << ticks << endl;
+	ticks = clock();
+	copy(dstrings.begin(), dstrings.end(), ostream_iterator<string>(tmp2, "\n"));
+	ticks = clock() - ticks;
+	cout << "Iterating deque: " << ticks << endl;
 }
+
+// #include <algorithm>
+// #include <iostream>
+// #include <iterator>
+// #include <vector>
+// #include "Noisy.h"
+// using namespace std;
+
+// int main(){
+// 	vector<Noisy> v;
+// 	v.reserve(11);
+// 	cout << "11 spaces have been reserved" << endl;
+// 	generate_n(back_inserter(v), 10, NoisyGen());
+// 	ostream_iterator<Noisy> out(cout, " ");
+// 	cout << endl;
+// 	copy(v.begin(), v.end(), out);
+// 	cout << "Inserting an element:" << endl;
+// 	vector<Noisy>::iterator it = v.begin() + v.size()/2;
+// 	v.insert(it, Noisy());
+// 	cout << endl;
+// 	copy(v.begin(), v.end(), out);
+// 	cout << "\nErasing an element:" << endl;
+// 	it = v.begin() + v.size()/2;
+// 	v.erase(it);
+// 	cout << endl;
+// 	it = v.begin() + v.size()/2;
+// 	cout << endl;
+// }
+
+// #include <iterator>
+// #include <iostream>
+// #include <vector>
+// using namespace std;
+
+// int main(){
+// 	vector<int> vi(10, 0);
+// 	ostream_iterator<int> out(cout, " ");
+// 	vector<int>::iterator i = vi.begin();
+// 	*i = 47;
+// 	copy(vi.begin(), vi.end(), out);
+// 	cout << endl;
+// 	vi.resize(vi.capacity() + 1);
+// 	*i = 48;
+// 	copy(vi.begin(), vi.end(), out);
+// }
+
+// #include <cstdlib>
+// #include <iostream>
+// #include <vector>
+// #include <vector>
+// #include "Noisy.h"
+// using namespace std;
+
+// int main(){
+// 	int SIZE = 10;
+// 	vector<Noisy> vn;
+// 	Noisy n;
+// 	for (int i = 0; i < SIZE; i++){
+// 		vn.push_back(n);
+// 	}
+// 	cout << "\n cleaning up " << endl;
+// }
+
+// #include <iostream>
+// #include <iterator>
+// #include <algorithm>
+// #include <memory>
+// #include "Noisy.h"
+// using namespace std;
+
+// int main(){
+// 	const int QUANTITY = 10;
+// 	Noisy* np = reinterpret_cast<Noisy*>(new char[QUANTITY * sizeof(Noisy)]);
+// 	raw_storage_iterator<Noisy*, Noisy> rsi(np);
+// 	for(int i = 0; i < QUANTITY; i++)
+// 		*rsi++ = Noisy();
+// 	cout << endl;
+// 	copy(np, np+QUANTITY, ostream_iterator<Noisy>(cout, " "));
+// 	cout << endl;
+// 	for(int j = 0; j < QUANTITY; j++)
+// 		(&np[j])->~Noisy();
+// 	delete reinterpret_cast<char*>(np);
+// }
 
 // #include <deque>
 // #include <iostream>

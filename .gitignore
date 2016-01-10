@@ -35,4 +35,5 @@ code/
 html/
 note
 cl/
+*.1213
 *.tmp

@@ -1,58 +1,133 @@
 
-#include <cstddef>
 #include <ctime>
 #include <deque>
-#include <fstream>
 #include <iostream>
-#include <iterator>
-#include <sstream>
-#include <string>
 #include <vector>
 using namespace std;
 
 int main(){
-	char* fname = "7.1213.cpp";
-	ifstream in(fname);
-	vector<string> vstrings;
-	deque<string> dstrings;
-	string line;
+	long count = 1000;
+	int sz = 1000;
+	vector<int> vi(sz);
 	clock_t ticks = clock();
-	while(getline(in, line))
-		vstrings.push_back(line);
-	ticks = clock() - ticks;
-	cout << "Read into vector: " << ticks << endl;
-	ifstream in2(fname);
+	for(int i1 = 0; i1 < count; i1++)
+		for(int j = 0; j < sz; j++)
+			vi[j];
+	cout << "vector[] " << clock() - ticks << endl;
 	ticks = clock();
-	while(getline(in2, line))
-		dstrings.push_back(line);
-	ticks = clock() - ticks;
-	cout << "Read into deque: " << ticks << endl;
+	for(int i2 = 0; i2 < count; i2++)
+		for(int j = 0; j < sz; j++)
+			vi.at(j);
+	cout << "vector::at() " << clock() - ticks << endl;
+	deque<int> di(sz);
 	ticks = clock();
-	for(size_t i = 0; i < vstrings.size(); i++){
-		ostringstream ss;
-		ss << i;
-		vstrings[i] = ss.str() + ": " + vstrings[i];
+	for(int i3 = 0; i3 < count; i3++)
+		for(int j = 0; j < sz; j++)
+			di[j];
+	cout << "deque[] " << clock() - ticks << endl;
+	ticks = clock();
+	for(int i4 = 0; i4 < count; i4++)
+		for(int j = 0; j < sz; j++)
+			di.at(j);
+	cout << "deque::at() " << clock() - ticks << endl;
+	try{
+		di.at(vi.size() + 1);
+	}catch(...){
+		cerr << "Exception thrown" << endl;
 	}
-	ticks = clock() - ticks;
-	cout << "Indexing vector: " << ticks << endl;
-	ticks = clock();
-	for(size_t j = 0; j < dstrings.size(); j++){
-		ostringstream ss;
-		ss << j;
-		dstrings[j] = ss.str() + ": " + dstrings[j];
-	}
-	ticks = clock() - ticks;
-	cout << "Indexing deque: " << ticks << endl;
-	ofstream tmp1("tmp1.tmp"), tmp2("tmp2.tmp");
-	ticks = clock();
-	copy(vstrings.begin(), vstrings.end(), ostream_iterator<string>(tmp1, "\n"));
-	ticks = clock() - ticks;
-	cout << "Iterating vector: " << ticks << endl;
-	ticks = clock();
-	copy(dstrings.begin(), dstrings.end(), ostream_iterator<string>(tmp2, "\n"));
-	ticks = clock() - ticks;
-	cout << "Iterating deque: " << ticks << endl;
 }
+
+// #include <cstdlib>
+// #include <deque>
+// #include <iostream>
+// #include "Noisy.h"
+// using namespace std;
+
+// int main(){
+// 	int size = 1000;
+// 	deque<Noisy> dn;
+// 	Noisy n;
+// 	for(int i = 0; i < size; i++)
+// 		dn.push_back(n);
+// 	cout << "\n cleaning up" << endl;
+// }
+
+// #include <algorithm>
+// #include <cstdlib>
+// #include <deque>
+// #include <iostream>
+// #include <iterator>
+// #include <vector>
+// #include "Noisy.h"
+// using namespace std;
+
+// int main(){
+// 	int size = 25;
+// 	deque<Noisy> d;
+// 	generate_n(back_inserter(d), size, NoisyGen());
+// 	cout << "\n Converting to a vector(1)" << endl;
+// 	vector<Noisy> v1(d.begin(), d.end());
+// 	cout << "\n Converting to a vector(2)" << endl;
+// 	vector<Noisy> v2;
+// 	v2.reserve(d.size());
+// 	v2.assign(d.begin(), d.end());
+// 	cout << "\n Cleanup" << endl;
+// }
+
+// #include <cstddef>
+// #include <ctime>
+// #include <deque>
+// #include <fstream>
+// #include <iostream>
+// #include <iterator>
+// #include <sstream>
+// #include <string>
+// #include <vector>
+// using namespace std;
+
+// int main(){
+// 	char* fname = "7.1213.cpp";
+// 	ifstream in(fname);
+// 	vector<string> vstrings;
+// 	deque<string> dstrings;
+// 	string line;
+// 	clock_t ticks = clock();
+// 	while(getline(in, line))
+// 		vstrings.push_back(line);
+// 	ticks = clock() - ticks;
+// 	cout << "Read into vector: " << ticks << endl;
+// 	ifstream in2(fname);
+// 	ticks = clock();
+// 	while(getline(in2, line))
+// 		dstrings.push_back(line);
+// 	ticks = clock() - ticks;
+// 	cout << "Read into deque: " << ticks << endl;
+// 	ticks = clock();
+// 	for(size_t i = 0; i < vstrings.size(); i++){
+// 		ostringstream ss;
+// 		ss << i;
+// 		vstrings[i] = ss.str() + ": " + vstrings[i];
+// 	}
+// 	ticks = clock() - ticks;
+// 	cout << "Indexing vector: " << ticks << endl;
+// 	ticks = clock();
+// 	for(size_t j = 0; j < dstrings.size(); j++){
+// 		ostringstream ss;
+// 		ss << j;
+// 		dstrings[j] = ss.str() + ": " + dstrings[j];
+// 	}
+// 	ticks = clock() - ticks;
+// 	cout << "Indexing deque: " << ticks << endl;
+// 	ofstream tmp1("tmp1.tmp"), tmp2("tmp2.tmp");
+// 	ticks = clock();
+// 	copy(vstrings.begin(), vstrings.end(), ostream_iterator<string>(tmp1, "\n"));
+// 	ticks = clock() - ticks;
+// 	cout << "Iterating vector: " << ticks << endl;
+// 	ticks = clock();
+// 	copy(dstrings.begin(), dstrings.end(), ostream_iterator<string>(tmp2, "\n"));
+// 	ticks = clock() - ticks;
+// 	cout << "Iterating deque: " << ticks << endl;
+// }
 
 // #include <algorithm>
 // #include <iostream>
